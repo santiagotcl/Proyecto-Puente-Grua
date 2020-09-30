@@ -3,6 +3,8 @@ import sqlite3
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import requests
+from bs4 import BeautifulSoup
 
 app=Flask(__name__)
 
@@ -13,12 +15,18 @@ app=Flask(__name__)
 #app.config["MYSQL_DB"] = "bbddlub" #le pido que se conecte a la base de datos prueba flask
 ##cuando pongo el puerto no anda
 
+
+
 class User(UserMixin):
     def __init__(self, id, name, permiso):
         self.id = id
         self.name = name
         self.permiso = permiso
 
+class Temp():
+    def __init__(self,numero,peso):
+        self.numero = numero
+        self.peso = peso
 
 
 login_manager = LoginManager()
@@ -37,8 +45,7 @@ app.secret_key="mysecretkey"
 
 #en templates guardo todo lo que se ve
 
-suma=[]#memoria interna de articulos seleccionados
-total=0.0#total en pesos de la compra
+BigTemp=[]#memoria interna de articulos seleccionados
 
 #hashed_pw = generate_password_hash("1995",method="sha256")
 #mysql.execute("INSERT INTO usuarios (username,password,permiso) VALUES (?,?,?)", 
@@ -190,5 +197,34 @@ def Logout():
         return render_template("index.html")
 
 
+
+
+
+
+
+
+
+
+
+##########################################################################
+##########################APLICACION DE CAMIONES##########################
+########################################################################## 
+def get_data(): 
+    response = requests.get("http://10.0.0.28")
+    response.encoding = "utf-8"
+    response = requests.get("http://10.0.0.28")
+    soup=BeautifulSoup(response.text,'html.parser')
+    hola=soup.find_all("p")
+    hola1=[hola[3].contents[0],hola[5].contents[0]]
+    return(hola1)
+
+
+@app.route("/Nuevocamion", methods=['GET'])#recibo un parametro tipo string
+@login_required
+def Nuevocamion():
+    global BigTemp
+    return render_template("Nuevocamion.html",bigtemp=BigTemp,peso=get_data())       
+
+
 if __name__ == "__main__":
-    app.run(host= '192.168.0.101', port = 3000, debug = True) #hacemos que se refresque solo
+    app.run(port = 3000, debug = True) #hacemos que se refresque solo
