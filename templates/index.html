@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loguin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <p>{{message}}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+    <div style="display: flex; justify-content: center;">
+    <div style="width: 20%; height: 20%;">
+    <img src="/./static/Rivoli.png" class="img-fluid" alt="Responsive image">
+    </div>
+    </div>
+
+
+
+    <div class="d-flex" style="flex-direction: column; height: 50%; align-items: center; justify-content: center;">
+
+
+        <div style="display: flex; height: 50%;">
+
+            <form action="/Ingreso" method="POST" style="display: flex;flex-direction: column;">
+
+                <div class="form-group" style="margin: 1rem;">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" class="form-control" name="username">
+                </div>
+
+                <div class="form-group" style="margin: 1rem;">
+                    <label>Contraseña</label>
+                    <input type="password" class="form-control" name="password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar</button>
+            
+            </form>
+
+        </div>
+
+        <div style="display: flex; height: 50%;">
+
+            <form action="/Registro" method="POST" style="display: flex; justify-content: center; margin: 1rem;" >
+    
+                <button type="submit" class="btn btn-primary">Registrate!</button>
+    
+            </form>
+    
+        </div>
+
+
+      <div> 
+
+</body>
+</html>
