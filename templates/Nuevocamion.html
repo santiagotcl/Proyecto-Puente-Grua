@@ -20,83 +20,18 @@
     <h1>Ingreso de Nuevo Camion</h1>
 
     <div style="display: flex; flex-direction: column;">
-        <div style="display: flex; flex-direction: row; justify-content: space-around;">
-            <div>
-                <div><h3>Balanza 1</h3></div>
-                <div>{{peso.0}}</div>
-            </div>
-
-            <div>
-                <div><h3>Balanza 2</h3></div>
-                <div>{{peso.1}}</div>
-            </div>
-
-        </div>
-
-            
-
-        <div style="display: block; text-align: center;">
-
-            <a href="/Nuevocamion"><button class="btn btn-primary" style="margin: 1rem;" >Refrescar</button></a>
-
-        </div>
-
-        <div style="display: block; text-align: center;">
-
-            <button type="submit" class="btn btn-primary" style="margin: 1rem;" >Agregar Big-Bags</button>
-
-        </div>
-
-
-
-
-
+    
         <div>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">Nº Big-Bag</th>
-                    <th scope="col">Peso</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                    {% for sum in BigTemp %}
-
-                        <tr>
-                            <td>{{sum.numero}}</td>
-                            <td>{{sum.peso}}</td>
-                            <td>
-                                <form action="/Cambiar/{{sum.0}}" method="POST" class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                      <span class="input-group-text">{{sum.3}}</span>
-                                    </div>
-                                    <input type="number" class="form-control" style="width: 0.5rem;" name="permiso">
-                                    <button type="submit" class="btn btn-dark" >Cambiar</button>
-                                </form>               
-                            </td>
-                            <td>
-                                <a href="/Eliminar/{{sum.0}}"><button type="button" class="btn btn-danger" >Eliminar</button></a>
-                            </td> 
-                        
-                        
-                    {% endfor %}
-                        </tr>
-                    
-                </tbody>
-            </table>
-        </div>
-
-
-
-
-
-        <div>
-            <form action="/Registro_usuario" method="POST">
+            <form action="/CargaBigBags" method="POST">
         
                 <div class="form-group" style="margin: 1rem;">
                     <label>Nombre de Camionero</label>
                     <input type="text" class="form-control" name="nombre">
+                </div>
+
+                <div class="form-group" style="margin: 1rem;">
+                    <label>Modelo</label>
+                    <input type="text" class="form-control" name="modelo">
                 </div>
             
                 <div class="form-group" style="margin: 1rem;">
@@ -105,11 +40,18 @@
                 </div>
             
     
-                <button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button>
+                <button type="submit" class="btn btn-primary" style="margin: 1rem;">Comenzar!</button>
               </form>
         </div>
 
+        <div>
+            <a href="/Ingreso"><button type="button" class="btn btn-primary" >Volver!</button></a>
+
+        </div>
+
+
+
     </div>
-    <a href="/Ingreso"><button type="button" class="btn btn-primary" >Volver!</button></a>
+    
 </body>
 </html>

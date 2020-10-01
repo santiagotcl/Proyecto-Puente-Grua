@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import requests
 from bs4 import BeautifulSoup
+from datetime import date, datetime
+import time
 
 app=Flask(__name__)
 
@@ -46,7 +48,8 @@ app.secret_key="mysecretkey"
 #en templates guardo todo lo que se ve
 
 BigTemp=[]#memoria interna de articulos seleccionados
-
+Camion=[]#guarda los datos del camion donde se estan cargando big bags
+i=0
 #hashed_pw = generate_password_hash("1995",method="sha256")
 #mysql.execute("INSERT INTO usuarios (username,password,permiso) VALUES (?,?,?)", 
 #        ("scuozzo",hashed_pw,"1"))
@@ -59,7 +62,7 @@ def index():
 
 @app.route("/Ingreso", methods= ["GET","POST"])
 def Ingreso():
-    global data
+    #global data
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -130,7 +133,7 @@ def Usuarios():
         cur=mysql.cursor()
         cur.execute("SELECT * FROM usuarios")
         data = cur.fetchall()
-        return render_template("Usuarios.html",data=data)
+        return render_template("Usuarios.html")
 
 
 ##########################################################################
@@ -219,12 +222,65 @@ def get_data():
     return(hola1)
 
 
-@app.route("/Nuevocamion", methods=['GET'])#recibo un parametro tipo string
+##########################################################################
+##########################Fn principal####################################
+########################################################################## 
+
+@app.route("/CargaBigBags", methods=['POST','GET'])
+def CargaBigBags():
+    global BigTemp
+    global Camion
+    global i
+    if request.method == "POST":
+        nombre = request.form["nombre"]
+        modelo = request.form["modelo"]
+        patente = request.form["patente"]
+        Camion.append(nombre)
+        Camion.append(modelo)
+        Camion.append(patente)
+        i=0
+        flash("Puedes Comenzar!")
+        peso=get_data()
+        return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
+    if request.method == "GET":
+        peso=get_data()
+        return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
+
+
+##########################################################################
+##################pagina de carga de datos del camion#####################
+########################################################################## 
+
+@app.route("/Nuevocamion", methods=['GET'])
 @login_required
 def Nuevocamion():
-    global BigTemp
-    return render_template("Nuevocamion.html",bigtemp=BigTemp,peso=get_data())       
+    return render_template("/Nuevocamion.html")    
 
+
+##########################################################################
+######################Carga de big-Bag en la BDD####3#####################
+########################################################################## 
+
+@app.route("/anadirbigbag/<peso0>/<peso1>")
+@login_required
+def anadirbigbag(peso0,peso1):
+    print(peso0)
+    print(peso1)
+    global Camion
+    global BigTemp
+    global i
+    i=i+1
+    listemp=[i,peso0]
+    BigTemp.append(listemp)
+    i=i+1
+    listemp=[i,peso1]
+    BigTemp.append(listemp)
+    peso=get_data()
+    print(BigTemp)
+    now = datetime.now()
+    fecha = now.strftime('%d-%m-%Y')
+    hora = now.strftime('%H:%M')
+    return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 if __name__ == "__main__":
     app.run(port = 3000, debug = True) #hacemos que se refresque solo

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <p>{{message}}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% set i=0 %}
+
+    <h1>Ingreso de Nuevo Camion</h1>
+
+    <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row; justify-content: space-around;">
+            <div>
+                <div><h3>Balanza 1</h3></div>
+                <div>{{peso.0}}</div>
+            </div>
+
+            <div>
+                <div><h3>Balanza 2</h3></div>
+                <div>{{peso.1}}</div>
+            </div>
+
+        </div>
+
+            
+
+        <div style="display: block; text-align: center;">
+
+            <a href="/CargaBigBags"><button class="btn btn-primary" style="margin: 1rem;" >Refrescar</button></a>
+
+        </div>
+
+        <div style="display: block; text-align: center;">
+
+            <a href="/anadirbigbag/{{peso.0}}/{{peso.1}}"><button type="submit" class="btn btn-primary" style="margin: 1rem;" >Agregar Big-Bags</button></a>
+
+        </div>
+
+
+
+
+
+        <div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Nº Big-Bag</th>
+                    <th scope="col">Peso</th>
+                    <th scope="col">Eliminar</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                    {% for sum in bigtemp %}
+
+                        <tr>
+                            <td>{{sum.0}}</td>
+                            <td>{{sum.1}}</td>
+                            <td>
+                                <form action="/Cambiar/{{sum.0}}" method="POST" class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">{{sum.3}}</span>
+                                    </div>
+                                    <input type="number" class="form-control" style="width: 0.5rem;" name="permiso">
+                                    <button type="submit" class="btn btn-dark" >Cambiar</button>
+                                </form>               
+                            </td>
+                            <td>
+                                <a href="/Eliminar/{{sum.0}}"><button type="button" class="btn btn-danger" >Eliminar</button></a>
+                            </td> 
+                        
+                        
+                    {% endfor %}
+                        </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+
+        <div>
+            <form action="/Registro_usuario" method="POST">
+        
+                <div class="form-group" style="margin: 1rem;">
+                    <label>Nombre de Camionero</label>
+                    <input type="text" class="form-control" name="nombre">
+                </div>
+            
+                <div class="form-group" style="margin: 1rem;">
+                    <label>Petente</label>
+                    <input type="text" class="form-control" name="patente">
+                </div>
+            
+    
+                <button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button>
+              </form>
+        </div>
+
+    </div>
+    <a href="/Ingreso"><button type="button" class="btn btn-primary" >Volver!</button></a>
+</body>
+</html>
