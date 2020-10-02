@@ -50,6 +50,7 @@ app.secret_key="mysecretkey"
 BigTemp=[]#memoria interna de articulos seleccionados
 Camion=[]#guarda los datos del camion donde se estan cargando big bags
 i=0
+nelim=[]#numeros de big bags eliminados
 #hashed_pw = generate_password_hash("1995",method="sha256")
 #mysql.execute("INSERT INTO usuarios (username,password,permiso) VALUES (?,?,?)", 
 #        ("scuozzo",hashed_pw,"1"))
@@ -133,7 +134,7 @@ def Usuarios():
         cur=mysql.cursor()
         cur.execute("SELECT * FROM usuarios")
         data = cur.fetchall()
-        return render_template("Usuarios.html")
+        return render_template("Usuarios.html",data=data)
 
 
 ##########################################################################
@@ -221,12 +222,22 @@ def get_data():
     hola1=[hola[3].contents[0],hola[5].contents[0]]
     return(hola1)
 
+def get_fecha():
+    now = datetime.now()
+    fecha = now.strftime('%d-%m-%Y')
+    return(fecha)
+
+def get_hora():
+    now = datetime.now()
+    hora = now.strftime('%H:%M')
+    return(hora)
 
 ##########################################################################
 ##########################Fn principal####################################
 ########################################################################## 
 
 @app.route("/CargaBigBags", methods=['POST','GET'])
+@login_required
 def CargaBigBags():
     global BigTemp
     global Camion
@@ -239,11 +250,29 @@ def CargaBigBags():
         Camion.append(modelo)
         Camion.append(patente)
         i=0
-        flash("Puedes Comenzar!")
         peso=get_data()
+        mysql = sqlite3.connect("./Proyecto.db")
+        cur=mysql.cursor()
+        cur.execute("SELECT * FROM camiones WHERE patente = ? ORDER BY n DESC", (Camion[2],))#busco si ese camion ya tiene registros ese dia para retomar carga en caso de algun problema
+        ntemp = cur.fetchall()
+        #verifico si tengo registros y si es asi busco el ultimo n de bigbags para continuar con la carga
+        if(len(ntemp)>0):    
+            ntemp = list(ntemp[0])
+            i=ntemp[6]
+            mysql = sqlite3.connect("./Proyecto.db")
+            cur=mysql.cursor()
+            cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
+            BigTemp = cur.fetchall()
+            mysql.close
+        flash("Puedes Comenzar!")
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
     if request.method == "GET":
         peso=get_data()
+        mysql = sqlite3.connect("./Proyecto.db")
+        cur=mysql.cursor()
+        cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
+        BigTemp = cur.fetchall()
+        mysql.close
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 
@@ -258,7 +287,7 @@ def Nuevocamion():
 
 
 ##########################################################################
-######################Carga de big-Bag en la BDD####3#####################
+######################Carga de big-Bag en la BDD##########################
 ########################################################################## 
 
 @app.route("/anadirbigbag/<peso0>/<peso1>")
@@ -269,18 +298,77 @@ def anadirbigbag(peso0,peso1):
     global Camion
     global BigTemp
     global i
-    i=i+1
-    listemp=[i,peso0]
-    BigTemp.append(listemp)
-    i=i+1
-    listemp=[i,peso1]
-    BigTemp.append(listemp)
-    peso=get_data()
-    print(BigTemp)
+    #obtengo hora y fecha actuales
     now = datetime.now()
     fecha = now.strftime('%d-%m-%Y')
     hora = now.strftime('%H:%M')
-    return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
+    #me conecto con la BDD
+    mysql = sqlite3.connect("./Proyecto.db")
+    
+    if(len(nelim)>0):#verifico que no se hayan eliminado bigbags previamente
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
+        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[0],peso0))
+        mysql.commit()
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
+        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[1],peso1))
+        mysql.commit()
+        nelim.clear()
+    else:
+        i=i+1
+        #guardo BigBag de balanza 1 en la BDD
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
+            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso0))
+        mysql.commit()
+        #repito el proceso
+        i=i+1
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
+            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso1))
+        mysql.commit()
+    cur=mysql.cursor()
+    cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
+    BigTemp = cur.fetchall()
+    peso=get_data()
+    return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)
+
+##########################################################################
+######################Eliminar Big Bag de la BDD##########################
+##########################################################################
+@app.route("/Eliminarbigbag/<string:id>/<int:n>")#recibo un parametro tipo string
+@login_required
+def eliminarbigbag(id,n):
+    global BigTemp
+    global nelim
+    mysql = sqlite3.connect("./Proyecto.db")
+    #elimino de a pares, ya que la balanza siempre pesa de a 2
+    nelim.append(n)
+    nelim.append(n+1)
+    cur = mysql.cursor()
+    #borro de a pares
+    cur.execute("DELETE FROM camiones WHERE id = ?", (id,))
+    mysql.commit() #guardo los cambios
+    cur.execute("DELETE FROM camiones WHERE id = ?", ((int(id)+1),))
+    mysql.commit() #guardo los cambios
+    #cargo BigTemp
+    cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
+    BigTemp = cur.fetchall()
+    flash("BigBag eliminado satifactoriamente") #envia mesajes entre vistas
+    mysql.close
+    return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=get_data())
+
+
+@app.route("/ingresarcamion")
+@login_required
+def ingresarcamion():
+    global BigTemp
+    global nelim
+    global i
+    global Camion
+    Camion.clear()
+    BigTemp.clear()
+    nelim.clear()
+    i=0
+    return render_template("/buscar.html")
+
 
 if __name__ == "__main__":
     app.run(port = 3000, debug = True) #hacemos que se refresque solo

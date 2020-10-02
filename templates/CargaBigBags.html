@@ -65,21 +65,13 @@
                     {% for sum in bigtemp %}
 
                         <tr>
-                            <td>{{sum.0}}</td>
-                            <td>{{sum.1}}</td>
+                            <td>{{sum.6}}</td>
+                            <td>{{sum.7}}</td>
+                            {% if (sum.6 % 2) != 0 %}
                             <td>
-                                <form action="/Cambiar/{{sum.0}}" method="POST" class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                      <span class="input-group-text">{{sum.3}}</span>
-                                    </div>
-                                    <input type="number" class="form-control" style="width: 0.5rem;" name="permiso">
-                                    <button type="submit" class="btn btn-dark" >Cambiar</button>
-                                </form>               
-                            </td>
-                            <td>
-                                <a href="/Eliminar/{{sum.0}}"><button type="button" class="btn btn-danger" >Eliminar</button></a>
+                                <a href="/Eliminarbigbag/{{sum.0}}/{{sum.6}}"><button type="button" class="btn btn-danger" >Eliminar</button></a>
                             </td> 
-                        
+                            {% endif %}
                         
                     {% endfor %}
                         </tr>
@@ -93,21 +85,7 @@
 
 
         <div>
-            <form action="/Registro_usuario" method="POST">
-        
-                <div class="form-group" style="margin: 1rem;">
-                    <label>Nombre de Camionero</label>
-                    <input type="text" class="form-control" name="nombre">
-                </div>
-            
-                <div class="form-group" style="margin: 1rem;">
-                    <label>Petente</label>
-                    <input type="text" class="form-control" name="patente">
-                </div>
-            
-    
-                <button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button>
-              </form>
+            <a href="/ingresarcamion"><button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button></a>
         </div>
 
     </div>
