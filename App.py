@@ -64,6 +64,10 @@ def index():
 @app.route("/Ingreso", methods= ["GET","POST"])
 def Ingreso():
     #global data
+    global BigTemp
+    global nelim
+    global i
+    global Camion
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -89,11 +93,15 @@ def Ingreso():
     if request.method == "GET":
         #vuelvo a cargar data con los datos del usuario
         #if "username" in session:
+        Camion.clear()
+        BigTemp.clear()
+        nelim.clear()
+        i=0
         flash("the current user is " + current_user.name)
         return render_template("buscar.html")
         #else:
-        flash("Debes loguearte primero")
-        return render_template("index.html")
+        #flash("Debes loguearte primero")
+        #return render_template("index.html")
 
 
 ##########################################################################
@@ -253,7 +261,7 @@ def CargaBigBags():
         peso=get_data()
         mysql = sqlite3.connect("./Proyecto.db")
         cur=mysql.cursor()
-        cur.execute("SELECT * FROM camiones WHERE patente = ? ORDER BY n DESC", (Camion[2],))#busco si ese camion ya tiene registros ese dia para retomar carga en caso de algun problema
+        cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC", (Camion[2],get_fecha()))#busco si ese camion ya tiene registros ese dia para retomar carga en caso de algun problema
         ntemp = cur.fetchall()
         #verifico si tengo registros y si es asi busco el ultimo n de bigbags para continuar con la carga
         if(len(ntemp)>0):    
@@ -265,6 +273,7 @@ def CargaBigBags():
             BigTemp = cur.fetchall()
             mysql.close
         flash("Puedes Comenzar!")
+        print(i)
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
     if request.method == "GET":
         peso=get_data()
@@ -273,6 +282,8 @@ def CargaBigBags():
         cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
         BigTemp = cur.fetchall()
         mysql.close
+        flash("Puedes Comenzar!")
+        print(i)
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 
