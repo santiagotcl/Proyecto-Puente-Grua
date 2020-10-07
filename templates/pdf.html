@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+    <h1>Camion</h1>
+
+    <div style="display: flex; flex-direction: column;">
+
+
+        <div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Nº Big-Bag</th>
+                    <th scope="col">Peso</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                    {% for sum in bigtemp %}
+
+                        <tr>
+                            <td>{{sum.6}}</td>
+                            <td>{{sum.7}}</td>
+
+                        
+                    {% endfor %}
+                        </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        <div><button type="button" class="btn btn-primary" >Volver!</button></div>
+    </div>
+
+</body>
+</html>

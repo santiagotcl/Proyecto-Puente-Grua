@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, session, escape
+from flask import Flask, render_template, request, url_for, redirect, flash, session, escape, make_response
 import sqlite3
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,6 +7,8 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime
 import time
+import pdfkit
+import os
 
 app=Flask(__name__)
 
@@ -222,12 +224,13 @@ def Logout():
 ##########################APLICACION DE CAMIONES##########################
 ########################################################################## 
 def get_data(): 
-    response = requests.get("http://10.0.0.28")
-    response.encoding = "utf-8"
-    response = requests.get("http://10.0.0.28")
-    soup=BeautifulSoup(response.text,'html.parser')
-    hola=soup.find_all("p")
-    hola1=[hola[3].contents[0],hola[5].contents[0]]
+    #response = requests.get("http://10.0.0.28")
+    #response.encoding = "utf-8"
+    #response = requests.get("http://10.0.0.28")
+    #soup=BeautifulSoup(response.text,'html.parser')
+    #hola=soup.find_all("p")
+    #hola1=[hola[3].contents[0],hola[5].contents[0]]
+    hola1=[300,256]
     return(hola1)
 
 def get_fecha():
@@ -374,11 +377,21 @@ def ingresarcamion():
     global nelim
     global i
     global Camion
+    rendered = render_template("/pdf.html",bigtemp=BigTemp)
+    css = ['./templates/bootstrap.css']
+    path_wkthmltopdf = b'C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+    pdf = pdfkit.from_string(rendered, False, css=css, configuration=config)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=output.pdf'
+
     Camion.clear()
     BigTemp.clear()
     nelim.clear()
     i=0
-    return render_template("/buscar.html")
+ 
+    return response
 
 
 if __name__ == "__main__":
