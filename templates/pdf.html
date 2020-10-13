@@ -10,13 +10,30 @@
 <body>
 
 
-    <h1>Camion</h1>
 
-    <div style="display: flex; flex-direction: column;">
+    <div class="d-flex flex-column">
 
+        <div class="d-flex flex-row justify-content-around p-3">
 
+            <div>
+                <img src='../static/Rivoli.png'>
+                <div class="row justify-content-center h-100">Santiago Cuozzo</div>
+            </div>
+
+            <div>
+                <ul>
+                    <h3><li>Nombre: {{camion.0}}</li></h3>
+                    <h3><li>Modelo: {{camion.1}}</li></h3>
+                    <h3><li>Patente: {{camion.2}}</li></h3>
+                    <h3><li>Total: 1250 KG</li></h3>
+                </ul>
+            </div>
+            
+        </div>
+       
         <div>
-            <table class="table">
+            <hr style="border-color:red;">
+            <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th scope="col">Nº Big-Bag</th>
@@ -26,19 +43,15 @@
                 <tbody>
 
                     {% for sum in bigtemp %}
-
                         <tr>
                             <td>{{sum.6}}</td>
-                            <td>{{sum.7}}</td>
-
-                        
+                            <td>{{sum.7}}</td>   
                     {% endfor %}
                         </tr>
                     
                 </tbody>
             </table>
         </div>
-        <div><button type="button" class="btn btn-primary" >Volver!</button></div>
     </div>
 
 </body>

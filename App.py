@@ -9,6 +9,12 @@ from datetime import date, datetime
 import time
 import pdfkit
 import os
+from  flask_weasyprint  import  HTML ,  render_pdf
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 app=Flask(__name__)
 
@@ -243,6 +249,61 @@ def get_hora():
     hora = now.strftime('%H:%M')
     return(hora)
 
+def Enviar_Email():
+    global BigTemp
+    global Camion
+    # Iniciamos los parámetros del script
+    remitente = 'santiagocuozzo@hotmail.com'
+    destinatarios = ['santiagocuozzo2@gmail.com']
+    asunto = '[RPI] Correo de prueba'
+    cuerpo = 'Este es el contenido del mensaje'
+    ruta_adjunto = 'C:/Users/TCL A3 4500/Desktop/Proyecto-Puente-Grua/'+Camion[2]+'.pdf'
+    nombre_adjunto = Camion[2]+'.pdf'
+
+    # Creamos el objeto mensaje
+    mensaje = MIMEMultipart()
+    
+    # Establecemos los atributos del mensaje
+    mensaje['From'] = remitente
+    mensaje['To'] = ", ".join(destinatarios)
+    mensaje['Subject'] = asunto
+    
+    # Agregamos el cuerpo del mensaje como objeto MIME de tipo texto
+    mensaje.attach(MIMEText(cuerpo, 'plain'))
+    
+    # Abrimos el archivo que vamos a adjuntar
+    archivo_adjunto = open(ruta_adjunto, 'rb')
+    
+    # Creamos un objeto MIME base
+    adjunto_MIME = MIMEBase('application', 'octet-stream')
+    # Y le cargamos el archivo adjunto
+    adjunto_MIME.set_payload((archivo_adjunto).read())
+    # Codificamos el objeto en BASE64
+    encoders.encode_base64(adjunto_MIME)
+    # Agregamos una cabecera al objeto
+    adjunto_MIME.add_header('Content-Disposition', "attachment; filename= %s" % nombre_adjunto)
+    # Y finalmente lo agregamos al mensaje
+    mensaje.attach(adjunto_MIME)
+    
+    # Creamos la conexión con el servidor
+    sesion_smtp = smtplib.SMTP('smtp-mail.outlook.com', 587)
+    
+    # Ciframos la conexión
+    sesion_smtp.starttls()
+
+    # Iniciamos sesión en el servidor
+    sesion_smtp.login('santiagocuozzo@hotmail.com','Elnote7explota')
+
+    # Convertimos el objeto mensaje a texto
+    texto = mensaje.as_string()
+
+    # Enviamos el mensaje
+    sesion_smtp.sendmail(remitente, destinatarios, texto)
+
+    # Cerramos la conexión
+    sesion_smtp.quit()
+    return
+
 ##########################################################################
 ##########################Fn principal####################################
 ########################################################################## 
@@ -275,8 +336,7 @@ def CargaBigBags():
             cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
             BigTemp = cur.fetchall()
             mysql.close
-        flash("Puedes Comenzar!")
-        print(i)
+        flash("Puedes Comenzar!")    
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
     if request.method == "GET":
         peso=get_data()
@@ -286,7 +346,6 @@ def CargaBigBags():
         BigTemp = cur.fetchall()
         mysql.close
         flash("Puedes Comenzar!")
-        print(i)
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 
@@ -307,8 +366,6 @@ def Nuevocamion():
 @app.route("/anadirbigbag/<peso0>/<peso1>")
 @login_required
 def anadirbigbag(peso0,peso1):
-    print(peso0)
-    print(peso1)
     global Camion
     global BigTemp
     global i
@@ -370,6 +427,8 @@ def eliminarbigbag(id,n):
     return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=get_data())
 
 
+
+
 @app.route("/ingresarcamion")
 @login_required
 def ingresarcamion():
@@ -377,21 +436,29 @@ def ingresarcamion():
     global nelim
     global i
     global Camion
-    rendered = render_template("/pdf.html",bigtemp=BigTemp)
-    css = ['./templates/bootstrap.css']
-    path_wkthmltopdf = b'C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe'
-    config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-    pdf = pdfkit.from_string(rendered, False, css=css, configuration=config)
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=output.pdf'
-
+    rendered = render_template("/pdf.html",bigtemp=BigTemp,camion=Camion)
+    HTML ( string = rendered ).write_pdf('./'+Camion[2]+'.pdf')
+    #hola='camioncete2.pdf'
+    Enviar_Email()
     Camion.clear()
     BigTemp.clear()
     nelim.clear()
     i=0
- 
-    return response
+    #return render_pdf ( HTML ( string = rendered ), download_filename = hola)
+    return render_template("/buscar.html")
+    
+
+
+
+
+
+
+
+
+
+
+    
+    
 
 
 if __name__ == "__main__":
