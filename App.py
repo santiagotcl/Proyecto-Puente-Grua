@@ -337,6 +337,7 @@ def CargaBigBags():
             BigTemp = cur.fetchall()
             mysql.close
         flash("Puedes Comenzar!")    
+        print('holiiiiiiiiiiiiiiiii 2')
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
     if request.method == "GET":
         peso=get_data()
@@ -346,6 +347,7 @@ def CargaBigBags():
         BigTemp = cur.fetchall()
         mysql.close
         flash("Puedes Comenzar!")
+        print('holiiiiiii 1')
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 
