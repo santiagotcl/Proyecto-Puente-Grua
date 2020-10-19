@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camion</title>
-    <link rel="stylesheet" href="../static/bootstrap.css"/>
-    <script src="../static/jquery-3.5.1.min.js"></script>
+
+    <link rel="stylesheet"
+         href="{{url_for('.static', filename='bootstrap.css')}}">
+        
+
+    <script src="{{url_for('.static', filename='jquery-3.5.1.min.js')}}"></script>
+
+    
+    
 </head>
 
 <body>
@@ -92,7 +99,7 @@
     </div>
     <a href="/Ingreso"><button type="button" class="btn btn-primary" >Volver!</button></a>
 
-    <script>
+   <script>
         //Cuando la página esté cargada completamente
         $(document).ready(function(){
           //Cada 10 segundos (10000 milisegundos) se ejecutará la función refrescar
@@ -102,6 +109,7 @@
           //Actualiza la página
           location.assign("/CargaBigBags");
         }
-      </script>
+    </script>
+      
 </body>
 </html>

@@ -7,7 +7,6 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime
 import time
-import pdfkit
 import os
 from  flask_weasyprint  import  HTML ,  render_pdf
 import smtplib
@@ -230,13 +229,13 @@ def Logout():
 ##########################APLICACION DE CAMIONES##########################
 ########################################################################## 
 def get_data(): 
-    #response = requests.get("http://10.0.0.28")
-    #response.encoding = "utf-8"
-    #response = requests.get("http://10.0.0.28")
-    #soup=BeautifulSoup(response.text,'html.parser')
-    #hola=soup.find_all("p")
-    #hola1=[hola[3].contents[0],hola[5].contents[0]]
-    hola1=[300,256]
+    response = requests.get("http://10.0.0.28")
+    response.encoding = "utf-8"
+    response = requests.get("http://10.0.0.28")
+    soup=BeautifulSoup(response.text,'html.parser')
+    hola=soup.find_all("p")
+    hola1=[hola[3].contents[0],hola[5].contents[0]]
+    #hola1=[300,256]
     return(hola1)
 
 def get_fecha():
@@ -257,7 +256,7 @@ def Enviar_Email():
     destinatarios = ['santiagocuozzo2@gmail.com']
     asunto = '[RPI] Correo de prueba'
     cuerpo = 'Este es el contenido del mensaje'
-    ruta_adjunto = 'C:/Users/TCL A3 4500/Desktop/Proyecto-Puente-Grua/'+Camion[2]+'.pdf'
+    ruta_adjunto = 'C:/Users/pbertini/Desktop/Proyecto-Puente-Grua/'+Camion[2]+'.pdf'
     nombre_adjunto = Camion[2]+'.pdf'
 
     # Creamos el objeto mensaje
@@ -337,7 +336,6 @@ def CargaBigBags():
             BigTemp = cur.fetchall()
             mysql.close
         flash("Puedes Comenzar!")    
-        print('holiiiiiiiiiiiiiiiii 2')
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso)   
     if request.method == "GET":
         peso=get_data()
@@ -347,7 +345,6 @@ def CargaBigBags():
         BigTemp = cur.fetchall()
         mysql.close
         flash("Puedes Comenzar!")
-        print('holiiiiiii 1')
         return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=peso) 
 
 
