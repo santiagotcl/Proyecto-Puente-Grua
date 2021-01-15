@@ -301,7 +301,12 @@ def Enviar_Email():
 
     # Cerramos la conexión
     sesion_smtp.quit()
-    return
+
+    Camion.clear()
+    BigTemp.clear()
+    nelim.clear()
+    i=0
+    return render_template("/buscar.html")
 
 ##########################################################################
 ##########################Fn principal####################################
@@ -376,23 +381,23 @@ def anadirbigbag(peso0,peso1):
     mysql = sqlite3.connect("./Proyecto.db")
     
     if(len(nelim)>0):#verifico que no se hayan eliminado bigbags previamente
-        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
-        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[0],peso0))
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso,Salida) VALUES (?,?,?,?,?,?,?,?)", 
+        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[0],peso0,0))
         mysql.commit()
-        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
-        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[1],peso1))
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso,Salida) VALUES (?,?,?,?,?,?,?,?)", 
+        (Camion[0],Camion[1],Camion[2],fecha,hora,nelim[1],peso1,0))
         mysql.commit()
         nelim.clear()
     else:
         i=i+1
         #guardo BigBag de balanza 1 en la BDD
-        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
-            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso0))
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso,Salida) VALUES (?,?,?,?,?,?,?,?)", 
+            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso0,0))
         mysql.commit()
         #repito el proceso
         i=i+1
-        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso) VALUES (?,?,?,?,?,?,?)", 
-            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso1))
+        mysql.execute("INSERT INTO camiones (nombre,modelo,patente,fecha,hora,n,peso,Salida) VALUES (?,?,?,?,?,?,?,?)", 
+            (Camion[0],Camion[1],Camion[2],fecha,hora,i,peso1,0))
         mysql.commit()
     cur=mysql.cursor()
     cur.execute("SELECT * FROM camiones WHERE patente = ? AND fecha = ? ORDER BY n DESC ", (Camion[2],get_fecha()))
@@ -437,14 +442,10 @@ def ingresarcamion():
     global Camion
     rendered = render_template("/pdf.html",bigtemp=BigTemp,camion=Camion)
     HTML ( string = rendered ).write_pdf('./'+Camion[2]+'.pdf')
-    #hola='camioncete2.pdf'
     Enviar_Email()
-    Camion.clear()
-    BigTemp.clear()
-    nelim.clear()
-    i=0
-    #return render_pdf ( HTML ( string = rendered ), download_filename = hola)
     return render_template("/buscar.html")
+    #return render_pdf ( HTML ( string = rendered ), download_filename = hola)
+    #return render_template("/buscar.html")
     
 
 

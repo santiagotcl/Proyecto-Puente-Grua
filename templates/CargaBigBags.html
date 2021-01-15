@@ -93,7 +93,7 @@
 
 
         <div>
-            <a href="/ingresarcamion"><button type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button></a>
+            <button  id="target" type="submit" class="btn btn-primary" style="margin: 1rem;">Ingresar Camion</button>
         </div>
 
     </div>
@@ -103,12 +103,16 @@
         //Cuando la página esté cargada completamente
         $(document).ready(function(){
           //Cada 10 segundos (10000 milisegundos) se ejecutará la función refrescar
-          setTimeout(refrescar, 10000);
+          time=setTimeout(refrescar, 10000);
         });
         function refrescar(){
           //Actualiza la página
           location.assign("/CargaBigBags");
         }
+        $( "#target" ).click(function() {
+            window.clearTimeout(time);
+            location.assign("/ingresarcamion");
+        });
     </script>
       
 </body>
