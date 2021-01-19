@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Camion</title>
+
+    <link rel="stylesheet"
+         href="{{url_for('.static', filename='bootstrap.css')}}">
+        
+
+    <script src="{{url_for('.static', filename='jquery-3.5.1.min.js')}}"></script>
+
+    
+    
+</head>
+
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <p>{{message}}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% set i=0 %}
+
+    <h1>Buscar camion</h1>
+
+    <h3>Buscar camion por patente</h3>
+
+    <form action="/Buscarporpatente" method="POST">
+        
+        <div class="form-group" style="margin: 1rem;">
+            <label>Patente</label>
+            <input type="text" class="form-control" name="patente">
+        </div>  
+
+        <button type="submit" class="btn btn-primary" style="margin: 1rem;">Buscar</button>
+    </form>
+
+
+
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Patente</th>
+                <th scope="col">Fecha</th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for sum in bigtemp %}
+
+                    <tr>
+                        <td>{{sum}}</td>
+                        <td>
+                            <a href="/abririnforme/{{sum}}"><button type="button" class="btn btn-danger" >Abrir informe</button></a>
+                        </td> 
+                {% endfor %}
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+    <h3>Buscar camion por fecha</h3>
+
+    <form action="/Buscarporfecha" method="POST">
+        
+        <div class="form-group" style="margin: 1rem;">
+            <label>Ingrese fecha en formato DD/MM/AAAA</label>
+            <input type="text" class="form-control" name="fecha">
+        </div>  
+
+        <button type="submit" class="btn btn-primary" style="margin: 1rem;">Buscar</button>
+    </form>
+
+
+
+
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Patente</th>
+                <th scope="col">Fecha</th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for sum in bigtemps %}
+
+                    <tr>
+                        <td>
+                            <a href="/Eliminarbigbag/{{sum.0}}/{{sum.6}}"><button type="button" class="btn btn-danger" >Eliminar</button></a>
+                        </td>
+                        <td>{{sum.7}}</td>
+                {% endfor %}
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <a href="/Ingreso"><button type="button" class="btn btn-primary" >Volver!</button></a>
+
+
+
+   <script>
+//        //Cuando la página esté cargada completamente
+//        $(document).ready(function(){
+//          //Cada 10 segundos (10000 milisegundos) se ejecutará la función refrescar
+//          time=setTimeout(refrescar, 10000);
+//        });
+//        function refrescar(){
+//          //Actualiza la página
+//          location.assign("/CargaBigBags");
+//        }
+//        $( "#target" ).click(function() {
+//            window.clearTimeout(time);
+//            location.assign("/ingresarcamion");
+//        });
+//    </script>
+      
+</body>
+</html>

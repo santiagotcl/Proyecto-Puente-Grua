@@ -63,6 +63,7 @@ nelim=[]#numeros de big bags eliminados
 #        ("scuozzo",hashed_pw,"1"))
 #mysql.commit()
 users=[]
+patente=""
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -256,8 +257,9 @@ def Enviar_Email():
     destinatarios = ['santiagocuozzo2@gmail.com']
     asunto = '[RPI] Correo de prueba'
     cuerpo = 'Este es el contenido del mensaje'
-    ruta_adjunto = 'C:/Users/pbertini/Desktop/Proyecto-Puente-Grua/'+Camion[2]+'.pdf'
-    nombre_adjunto = Camion[2]+'.pdf'
+    fecha=get_fecha()
+    ruta_adjunto = 'C:/Users/pbertini/Desktop/Proyecto-Puente-Grua/'+Camion[2]+"-"+fecha+'.pdf'
+    nombre_adjunto = Camion[2]+"-"+fecha+'.pdf'
 
     # Creamos el objeto mensaje
     mensaje = MIMEMultipart()
@@ -307,6 +309,24 @@ def Enviar_Email():
     nelim.clear()
     i=0
     return render_template("/buscar.html")
+
+def filtro(data):
+    n=0
+    fecha=[]
+    temp=list(data[0])
+    fecha.append(temp[4])
+    i=len(data)
+    print(i)
+    j=0
+    while(j<i):
+        temp=list(data[j])
+        print(temp)
+        if(fecha[n]!=temp[4]):
+            fecha.append(temp[4])
+            n=n+1
+        j=j+1
+    print(fecha)
+    return (fecha)
 
 ##########################################################################
 ##########################Fn principal####################################
@@ -440,8 +460,9 @@ def ingresarcamion():
     global nelim
     global i
     global Camion
+    fecha=get_fecha()
     rendered = render_template("/pdf.html",bigtemp=BigTemp,camion=Camion)
-    HTML ( string = rendered ).write_pdf('./'+Camion[2]+'.pdf')
+    HTML ( string = rendered ).write_pdf('./'+Camion[2]+"-"+fecha+'.pdf')
     Enviar_Email()
     return render_template("/buscar.html")
     #return render_pdf ( HTML ( string = rendered ), download_filename = hola)
@@ -449,16 +470,40 @@ def ingresarcamion():
     
 
 
+@app.route("/buscarcamion")
+@login_required
+def Buscarcamion():
+    return render_template("/buscarbigbag.html")
+
+@app.route("/Buscarporpatente", methods= ["POST"])
+@login_required
+def Buscarporpatente():
+    global patente
+    if request.method == "POST":
+        patente = request.form["patente"]
+        mysql = sqlite3.connect("./Proyecto.db")
+        cur=mysql.cursor()
+        cur.execute("SELECT * FROM camiones WHERE patente = ?",(patente,))
+        data = cur.fetchall()
+        mysql.close
+        data=filtro(data)
+        return render_template("/buscarbigbag.html",bigtemp=data)
+
+
+@app.route("/abririnforme/<string:fecha>", methods= ["GET"])
+@login_required
+def abririnfrome(fecha):
+    global patente
+    os.startfile('C:/Users/pbertini/Desktop/Proyecto-Puente-Grua/'+patente+"-"+fecha+'.pdf')
+    patente=""
+    return render_template("/buscar.html",)
+        
+        
 
 
 
 
 
-
-
-
-    
-    
 
 
 if __name__ == "__main__":
