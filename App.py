@@ -316,16 +316,13 @@ def filtro(data):
     temp=list(data[0])
     fecha.append(temp[4])
     i=len(data)
-    print(i)
     j=0
     while(j<i):
         temp=list(data[j])
-        print(temp)
         if(fecha[n]!=temp[4]):
             fecha.append(temp[4])
             n=n+1
         j=j+1
-    print(fecha)
     return (fecha)
 
 ##########################################################################
@@ -451,7 +448,9 @@ def eliminarbigbag(id,n):
     return render_template("/CargaBigBags.html",bigtemp=BigTemp,peso=get_data())
 
 
-
+##########################################################################
+######################Ingresar Camion y enviar E-Mail#####################
+##########################################################################
 
 @app.route("/ingresarcamion")
 @login_required
@@ -469,11 +468,20 @@ def ingresarcamion():
     #return render_template("/buscar.html")
     
 
+##########################################################################
+######################Buscar un camion en la BDD##########################
+##########################################################################
+
 
 @app.route("/buscarcamion")
 @login_required
 def Buscarcamion():
     return render_template("/buscarbigbag.html")
+
+
+##########################################################################
+##########################Buscar por patente##############################
+##########################################################################    
 
 @app.route("/Buscarporpatente", methods= ["POST"])
 @login_required
@@ -490,13 +498,17 @@ def Buscarporpatente():
         return render_template("/buscarbigbag.html",bigtemp=data)
 
 
+##########################################################################
+###########################Abrir un Informe###############################
+##########################################################################
+
 @app.route("/abririnforme/<string:fecha>", methods= ["GET"])
 @login_required
 def abririnfrome(fecha):
     global patente
     os.startfile('C:/Users/pbertini/Desktop/Proyecto-Puente-Grua/'+patente+"-"+fecha+'.pdf')
     patente=""
-    return render_template("/buscar.html",)
+    return render_template("/buscar.html")
         
         
 
