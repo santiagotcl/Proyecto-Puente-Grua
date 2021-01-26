@@ -1,11 +1,11 @@
 #include <ESP8266WiFi.h>
 
 //Información de nuestro WIFI
-const char *ssid = "Colgate de Esta!";
-const char *password = "sanmiguel530";
+const char *ssid = "TP-LINK_E950";
+const char *password = "22822611";
 
 //Datos para una IP estática
-IPAddress ip(192,168,0,10);     
+IPAddress ip(192,168,0,3);     
 IPAddress gateway(192,168,0,1);   
 IPAddress subnet(255,255,255,0); 
 
@@ -18,15 +18,16 @@ String peso2 = "";
 WiFiServer server(80);
  
 void setup() {
+  ESP.wdtDisable();
   Serial.begin(115200); //Iniciamos comunicación serial
   delay(10);
-  
-  pinMode(ledPin, OUTPUT);  //Pin del Led como salida
-  digitalWrite(ledPin, LOW);  //Ponemos la salida de led en bajo
+  pinMode(ledPin, INPUT_PULLUP);  //Pin del Led como salida
+  //digitalWrite(ledPin, LOW);  //Ponemos la salida de led en bajo
    
   // Conectandose al Wifi
   Serial.println();
   Serial.println();
+  Serial.println("Me Reinicie");
   Serial.print("Conectandose a ");
   Serial.println(ssid);
 
@@ -49,23 +50,26 @@ void setup() {
   Serial.println("Servidor iniciado");
  
   // Imprimimos la dirección IP
-  Serial.print("Usa esta URL para comunicar al ESP: ");
-  Serial.print("http://");
-  Serial.print(WiFi.localIP());
+  Serial.println("Usa esta URL para comunicar al ESP: ");
+  Serial.println("http://");
+  Serial.println(WiFi.localIP());
   Serial.println("/");
+  ESP.wdtEnable(1000);
     
 }
  
 void loop() {
+  ESP.wdtFeed();
+while (digitalRead(ledPin) == 0){
+  Serial.println("yella");
+  }
+  
    if (Serial.available() > 0)
    {
       str = Serial.readStringUntil('\n');
-      Serial.print(str);
       int coma = str.indexOf(",");
       peso1 = str.substring(0, coma);
-      Serial.print(peso1);
       peso2 = str.substring((coma + 1));
-      Serial.print(peso2);
    }
   
   // El servidor siempre estará esperando a que se conecte un cliente
@@ -84,25 +88,10 @@ void loop() {
   String request = client.readStringUntil('\r');
   Serial.println(request); //Imprimimos la solicitud
   client.flush(); //Descartamos los datos que se han escrito en el cliente y no se han leído
-   
-  // Relacionamos la solicitud
-  if (request.indexOf("/LED=OFF") != -1){
-    digitalWrite(ledPin, LOW);
-  }
-  if (request.indexOf("/LED=ON") != -1) {
-    digitalWrite(ledPin, HIGH);
-  } 
-  
-  if (request.indexOf("/LED=BLINK") != -1){
-    for(int i=0;i<10;i++)
-    {
-    digitalWrite(ledPin, HIGH);
-    delay(200);
-    digitalWrite(ledPin, LOW);
-    delay(200);
-    }
-  }
+   ESP.wdtFeed();
 
+
+ESP.wdtFeed();
   // Respuesta del servidor web
   
   client.println("HTTP/1.1 200 OK"); // La respuesta empieza con una linea de estado  
@@ -113,24 +102,17 @@ void loop() {
   client.println("<head>");
   client.println("<meta charset=\"UTF-8\">");
   client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"); //Para que se adapte en móviles
-  client.println("<title>Servidor Web ESP8266</title>");
+  client.println("<TITLE>WI-FI Monitor</TITLE>");
   client.println("</head>");
   client.println("<body>");
   client.println("<br><br>");
   
-  client.println("<h1 style=\"text-align: center;\">Servidor Web ESP8266</h1>");
+  client.println("<H1>Balanza de Big-Bags, Molino Cotella</H1>");
   
-  client.println("<p style=\"text-align: center;\">");
-  client.println("Click <a href=\"/LED=ON\">Aqui</a> para encender LED en el pin 2 ON<br>"); //Oración que contiene un hipervínculo
-  client.println("Click <a href=\"/LED=OFF\">Aqui</a> para apagar el led en el pin 2 OFF<br>");
-  client.println("Click <a href=\"/LED=BLINK\">Aqui</a> para parpadar el led en el pin 2<br> <br>");
-  
+  client.println("<p> peso1:" +  peso1 + "</p>");
+  client.println("<p> peso2:" +  peso2 + "</p>");
+  client.println("<p>Santiago Cuozzo</p>");
 
-  client.println("<button onclick=location.href=\"/LED=ON\">" + peso1 + "</button> <br> <br>"); // Botón sencillo que contiene hipervínculo
-  client.println("<button onclick=location.href=\"/LED=OFF\" >" + peso2 + "</button> <br> <br>");
-  client.println("<button onclick=location.href=\"/LED=BLINK\">Parpadear LED </button> <br> <br>");
-
-  client.println("</p>");
   client.println("</body>");
   
   client.println("</html>"); //Terminamos el HTML
