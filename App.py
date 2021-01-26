@@ -230,12 +230,12 @@ def Logout():
 ##########################APLICACION DE CAMIONES##########################
 ########################################################################## 
 def get_data(): 
-    response = requests.get("http://10.0.0.28")
+    response = requests.get("http://192.168.0.3")
     response.encoding = "utf-8"
-    response = requests.get("http://10.0.0.28")
+    response = requests.get("http://192.168.0.3")
     soup=BeautifulSoup(response.text,'html.parser')
     hola=soup.find_all("p")
-    hola1=[hola[3].contents[0],hola[5].contents[0]]
+    hola1=[hola[0].contents[0],hola[1].contents[0]]
     #hola1=[300,256]
     return(hola1)
 
