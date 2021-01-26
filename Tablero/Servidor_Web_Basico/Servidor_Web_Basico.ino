@@ -108,9 +108,12 @@ ESP.wdtFeed();
   client.println("<br><br>");
   
   client.println("<H1>Balanza de Big-Bags, Molino Cotella</H1>");
-  
-  client.println("<p> peso1:" +  peso1 + "</p>");
-  client.println("<p> peso2:" +  peso2 + "</p>");
+  client.println("<br>");
+  client.println("peso1:");
+  client.println("<p>"+peso1+"</p>");
+  client.println("<br>");
+  client.println("peso2:");
+  client.println("<p>"+peso2+"</p>");
   client.println("<p>Santiago Cuozzo</p>");
 
   client.println("</body>");
