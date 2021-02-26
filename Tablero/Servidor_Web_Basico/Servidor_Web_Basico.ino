@@ -2,7 +2,7 @@
 
 //Información de nuestro WIFI
 const char *ssid = "TP-LINK_E950";
-const char *password = "22822611";
+const char *password = "mectaller21";
 
 //Datos para una IP estática
 IPAddress ip(192,168,0,3);     
